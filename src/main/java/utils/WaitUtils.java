@@ -8,17 +8,14 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 
+import static core.DriverFactory.getDriver;
+
 public class WaitUtils {
 
     private static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(Long.parseLong(ConfigReader.get("timeout")));
 
     private static WebDriverWait getWait() {
-        return new WebDriverWait(DriverFactory.getDriver(), DEFAULT_TIMEOUT);
-    }
-
-    public static void waitForPageToLoad() {
-        getWait().until(webDriver -> ((String) ((org.openqa.selenium.JavascriptExecutor) webDriver)
-                .executeScript("return document.readyState")).equals("complete"));
+        return new WebDriverWait(getDriver(), DEFAULT_TIMEOUT);
     }
 
     public static WebElement waitForVisibility(By locator) {
@@ -26,30 +23,20 @@ public class WaitUtils {
     }
 
     public static WebElement waitForClickability(By locator) {
-        return getWait().until(ExpectedConditions.elementToBeClickable(locator));
-    }
-
-    public static boolean waitForInvisibility(By locator) {
-        return getWait().until(ExpectedConditions.invisibilityOfElementLocated(locator));
+        WebDriverWait wait = new WebDriverWait(getDriver(), Duration.ofSeconds(10));
+        return wait.until(ExpectedConditions.elementToBeClickable(locator));
     }
 
     public static boolean waitForText(By locator, String text) {
         return getWait().until(ExpectedConditions.textToBe(locator, text));
     }
 
-    public static boolean waitForAttributeToBe(By locator, String attribute, String value) {
-        return getWait().until(ExpectedConditions.attributeToBe(locator, attribute, value));
+    public static void waitForUrlToContain(String urlPart) {
+        getWait().until(ExpectedConditions.urlContains(urlPart));
     }
 
-    public static boolean waitForAlert() {
-        return getWait().until(ExpectedConditions.alertIsPresent()) != null;
-    }
-
-    public static void waitForFrameToBeAvailableAndSwitchToIt(By locator) {
-        getWait().until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(locator));
-    }
-
-    public static void waitForElementToBeSelected(By locator) {
-        getWait().until(ExpectedConditions.elementToBeSelected(locator));
+    public static WebElement waitForPresence(By locator) {
+        WebDriverWait wait = new WebDriverWait(getDriver(), Duration.ofSeconds(15));
+        return wait.until(ExpectedConditions.presenceOfElementLocated(locator));
     }
 }
